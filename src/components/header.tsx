@@ -7,11 +7,14 @@ import { ModeToggle } from "./mode_toggle";
 import Logo from "./logo"; // Import the Logo component
 import { checkUser } from "@/lib/checkUser";
 
-const Header = async() => {
+
+// left-1/2 transform -translate-x-1/2
+
+const Header = async () => {
   await checkUser();
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 w-11/12 bg-white/5 backdrop-blur-lg z-50 border-2 border-border rounded-xl shadow-lg">
-      <nav className="px-6 py-4 flex items-center justify-between">
+    <div className="fixed top-0  w-full bg-white/5 backdrop-blur-lg z-50 border-b border-border shadow-lg">
+      <nav className="px-6 py-4 w-10/12 mx-auto flex items-center justify-between">
         <Link href="/">
           <Logo /> {/* Use the extracted Logo component */}
         </Link>
