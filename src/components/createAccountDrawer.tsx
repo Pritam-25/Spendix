@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createAccount } from "@/actions/dashboard";
+import { createAccount } from "@/actions/account";
 import useFetch from "@/app/hooks/useFetch";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";

@@ -1,9 +1,9 @@
-interface accountPageProps {
+interface AccountPageProps {
   params: { id: string };
 }
 
-const page = ({ params }: accountPageProps) => {
-  return <div>account id: {params.id}</div>;
+const Page = async({ params }: AccountPageProps) => {
+  return <div>Account ID: {params.id}</div>;
 };
 
-export default page;
+export default Page;

@@ -35,7 +35,8 @@ export default function RootLayout({
               <Header />
               <main className="flex-1">{children}</main>
               {/* add toaster */}
-              <Toaster />
+              <Toaster richColors/>
+              
               <footer className="bg-white/5 py-12">
                 <div className="container mx-auto px-4 text-center text-gray-600">
                   <p>Welcome to Spendix</p>
