@@ -14,7 +14,7 @@ const Header = async () => {
   await checkUser();
   return (
     <div className="fixed top-0  w-full bg-white/5 backdrop-blur-lg z-50 border-b border-border shadow-lg">
-      <nav className="px-6 py-4 w-10/12 mx-auto flex items-center justify-between">
+      <nav className="px-6 py-4 container mx-auto flex items-center justify-between">
         <Link href="/">
           <Logo /> {/* Use the extracted Logo component */}
         </Link>

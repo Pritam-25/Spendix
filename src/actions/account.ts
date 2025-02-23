@@ -3,10 +3,10 @@
 import { AccountFormType } from "@/app/lib/schema"
 import prisma from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
-import { Prisma } from "@prisma/client"
+import { Prisma, Transaction } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { serializeTransaction } from "./serialize"
-import { dark } from "@clerk/themes"
+import { promise } from "zod"
 
 // create account
 export async function createAccount(data: AccountFormType) {
@@ -137,3 +137,143 @@ export async function updateDefaultAccount(accountId: string) {
         return { success: false, data: (error as Error).message }
     }
 }
+
+
+// get all account with transaction details
+export async function getAllAccountWithTransactions(accountId: string) {
+    const { userId } = await auth()
+    if (!userId) throw new Error("Unauthorized")
+
+    const user = await prisma.user.findUnique({
+        where: { clerkUserId: userId }
+    })
+
+    if (!user) {
+        throw new Error("User not found")
+    }
+
+    // first find the account with the accountId
+    const account = await prisma.account.findUnique({
+        where: { id: accountId, userId: user.id },
+        include: {
+            transactions: {
+                orderBy: {
+                    date: "desc"
+                }
+            },
+            _count: {
+                select: { transactions: true }
+            }
+        }
+    })
+
+
+    if (!account) return null;
+
+    return {
+        ...serializeTransaction(account),
+        transactions: account.transactions.map(serializeTransaction)
+    }
+}
+
+
+// bulk delete transactions
+export async function bulkDeleteTransactions(transactionIds: string[]) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error("Unauthorized")
+
+        const user = await prisma.user.findUnique({
+            where: { clerkUserId: userId }
+        })
+
+        if (!user) {
+            throw new Error("User not found")
+        }
+
+        // find the transactions with transaction ids
+        const transactions = await prisma.transaction.findMany({
+            where: {
+                id: { in: transactionIds },
+                userId: user.id
+            }
+        })
+
+        if (transactions.length === 0) {
+            throw new Error("No transactions found to delete")
+        }
+
+        // after deleting calculate the account balance
+        const accountBalanceChange: Record<string, number> = {}
+
+        transactions.forEach(transaction => {
+            const change = transaction.type === "EXPENSE" ? transaction.amount : -transaction.amount;
+            accountBalanceChange[transaction.accountId] = (accountBalanceChange[transaction.accountId] || 0) + Number(change);
+
+            /*
+            accountBalanceChange = {
+                "A1": 500 - 300  // +200
+            };
+            */
+        })
+
+        // delete transactions
+        await prisma.transaction.deleteMany({
+            // this is prisma's transaction not schema
+            where: { id: { in: transactionIds } }
+        })
+
+        // update account balance
+        const updatePromise = Object.entries(accountBalanceChange).map(([accountId, change]) => {
+            return prisma.account.update({
+                where: { id: accountId },
+                data: { balance: { increment: change } }
+                // Use increment: change so Prisma automatically adjusts the balance.
+            })
+        })
+
+        await Promise.all(updatePromise)
+
+        /*  Object.entries
+        -----------------------
+        accountBalanceChange = {
+        "A1": 200,
+        "A2": -300
+        }
+        - - - - - - - - - 
+        * Object.entries(accountBalanceChange)
+        [
+        ["A1", 200],
+        ["A2", -300]
+        ]
+        */
+
+        //!  Bad Approach: Running Promises One by One
+        /*
+            async function updateBalances(balances) {
+                for (const [accountId, change] of Object.entries(balances)) {
+                    await prisma.account.update({
+                        where: { id: accountId },
+                        data: { balance: { increment: change } }
+                    });
+                }
+            }
+        */
+
+
+        // revalidate path
+        revalidatePath("/dashboard")
+        revalidatePath("/account/[id]", "page")
+        // revalidatePath() forces Next.js to refetch and re-render that page with updated data.
+
+        // return the response
+        return { success: true }
+
+    } catch (error) {
+        return {
+            success: false,
+            error: (error as Error).message
+        }
+    }
+
+}   
