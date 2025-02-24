@@ -23,7 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { Transaction } from "@prisma/client";
-import { compareAsc, format } from "date-fns";
+import {  format } from "date-fns";
 import { categoryColors } from "@/data/categories";
 
 import {

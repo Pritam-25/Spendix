@@ -8,28 +8,25 @@ const Logo = () => {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Wait until mounted to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Show nothing or a placeholder while waiting for client-side hydration
   if (!mounted) {
-    return (
-      <div className="h-10 w-[200px]" /> // Placeholder with same dimensions
-    );
+    return <div className="h-8 w-28 sm:h-9 sm:w-32 md:h-10 md:w-36" />; // Responsive placeholder
   }
 
   return (
-    <Image
-      src={theme === "dark" ? "/asset3.svg" : "/asset3-light.svg"}
-      alt="Spendix Logo"
-      height={60}
-      width={200}
-      priority
-      loading="eager"
-      className="h-10 w-auto object-contain"
-    />
+    <div className="relative h-8 w-28 sm:h-9 sm:w-32 md:h-10 md:w-40 lg:2-48">
+      <Image
+        src={theme === "dark" ? "/asset3.svg" : "/asset3-light.svg"}
+        alt="Spendix Logo"
+        fill
+        className="object-contain"
+        priority
+        sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
+      />
+    </div>
   );
 };
 

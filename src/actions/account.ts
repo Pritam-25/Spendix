@@ -93,7 +93,7 @@ export async function GetUserAccount() {
 
         return { success: true, data: serializedAccounts };
     } catch (error) {
-
+        throw new Error((error as Error).message);
     }
 }
 

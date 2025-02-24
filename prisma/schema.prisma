@@ -52,7 +52,7 @@ model Budget {
   updatedAt     DateTime  @updatedAt
 
   // Foreign Key
-  userId String
+  userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])

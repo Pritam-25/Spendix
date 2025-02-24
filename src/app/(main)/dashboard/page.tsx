@@ -4,14 +4,35 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Account } from "@prisma/client";
 import { Plus } from "lucide-react";
 import AccountCard from "./_components/accountCard";
+import { getCurrentBudget } from "@/actions/budget";
+import BudgetProgress from "./_components/budgetProgress";
 
 async function DashboardPage() {
+  // * find all accounts
   const accounts = await GetUserAccount();
   // console.log(Object.values(accounts?.data));
 
+  // * find the default account
+  const defaultAccount = accounts?.data.find((account) => account.isDefault);
+
+  // * find budget
+  let budgetData = null;
+  if (defaultAccount) {
+    budgetData = await getCurrentBudget(defaultAccount.id);
+  }
+
+  // console.log(budgetData);
+  
+
   return (
-    <div >
-      {/* Your dashboard content here */}
+    <div>
+      {/* Budget Progress */}
+      {defaultAccount && (
+        <BudgetProgress 
+          initialBudget = {budgetData?.budget}
+          currentExpense = {budgetData?.currentExpense}
+        />
+      )}
       {/*  */}
       {/* Accounts Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 ">
