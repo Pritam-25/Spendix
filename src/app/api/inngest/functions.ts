@@ -1,15 +1,20 @@
 import prisma from "@/lib/prisma";
 import { inngest } from "../../../inngest/client";
 
-export const helloWorld = inngest.createFunction(
+export const checkBudgetAlert = inngest.createFunction(
     {
         id: "",
         name: "Check Budget Alerts",
     },
     { cron: "0 0 * * *" },   // Run Every Day at Midnight (12:00 AM)
-    async ({ event, step }) => {
-        // await step.sleep("wait-a-moment", "1s");
-        // return { message: `Hello ${event.data.email}!` };
+
+    async ({ step }) => {
+
+        function isNewMonth(lastAlertDate: Date, currentDate: Date) {
+            return (
+                lastAlertDate.getMonth() !== currentDate.getMonth() || lastAlertDate.getFullYear() !== currentDate.getFullYear()
+            )
+        }
 
         try {
             const budgets = await step.run("fetch-budget", async () => {
@@ -31,15 +36,30 @@ export const helloWorld = inngest.createFunction(
                 if (!defaultAccount) continue;
 
                 await step.run(`check-budget-${budget.id}`, async () => {
-                    const startDate = new Date();
-                    startDate.setDate(1); // Start from the first day of the month
+                    // current date
+                    const currentDate = new Date();
+                    // strarting of a month from day 1
+                    const startOfMonth = new Date(
+                        currentDate.getFullYear(),
+                        currentDate.getMonth(),
+                        1
+                    )
+                    // ending of a month
+                    const endOfMonth = new Date(
+                        currentDate.getFullYear(),
+                        currentDate.getMonth() + 1,
+                        0
+                    )
 
                     const expenses = await prisma.transaction.aggregate({
                         where: {
                             userId: budget.userId,
                             accountId: defaultAccount.id,
                             type: "EXPENSE",
-                            date: { gte: startDate }
+                            date: {
+                                gte: startOfMonth,
+                                lte: endOfMonth,
+                            }
                         },
                         _sum: { amount: true }
                     });
@@ -48,7 +68,18 @@ export const helloWorld = inngest.createFunction(
                     const budgetAmount = Number(budget.amount) || 1; // Prevent division by zero
                     const percentageUsed = (totalExpenses / budgetAmount) * 100;
 
-                    console.log(`Budget ${budget.id} used ${percentageUsed.toFixed(2)}%`);
+
+
+
+                    if (percentageUsed >= 80 && (!budget.lastAlertSent || isNewMonth(new Date(budget.lastAlertSent), new Date()))) {
+                        // send email
+
+                        // update lastAlertSent
+                        await prisma.budget.update({
+                            where: { id: budget.id },
+                            data: { lastAlertSent: new Date() }
+                        })
+                    }
                 });
             }
         } catch (error) {
