@@ -45,8 +45,6 @@ export default function CreateAccountDrawer({
     handleSubmit,
     register,
     formState: { errors },
-    setValue,
-    watch,
     control,
     reset,
   } = useForm<AccountFormType>({

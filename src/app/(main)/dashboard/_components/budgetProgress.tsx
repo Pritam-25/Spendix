@@ -131,7 +131,7 @@ export default function BudgetProgress({
         </div>
       </CardHeader>
       <CardContent>
-        <Progress value={percentUsed} />
+        <Progress value={percentUsed} className="h-2"/>
         <div className="flex justify-end mt-1">
           <p className="text-xs text-muted-foreground">{percentUsed.toFixed(1)}% used</p>
         </div>
