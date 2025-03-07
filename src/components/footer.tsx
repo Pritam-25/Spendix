@@ -35,7 +35,7 @@ const Footer = () => {
                         </div>
 
                         {/* Links Section */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 lg:col-span-3 mt-6 sm:mt-0">
+                        <div className="grid grid-cols-3  gap-6 lg:col-span-3 mt-6 sm:mt-0">
                             {/* Product Links */}
                             <div className="space-y-3">
                                 <h4 className="text-sm font-semibold">Product</h4>

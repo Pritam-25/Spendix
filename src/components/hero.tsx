@@ -1,7 +1,7 @@
 "use client"
 import React from "react";
 import { Button } from "./ui/button";
-import { Bell, Sparkles, TrendingUp, Brain, ChevronDown, ChevronRight } from "lucide-react";
+import { Bell, Sparkles, TrendingUp, Brain, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import AnalyticsSection from "./analytics-section";
 import Footer from "./footer";
@@ -82,11 +82,11 @@ const HeroSection = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8"
+                className="flex gap-4 justify-center items-center mt-8"
               >
                 {/* Primary CTA Button */}
                 <Button
-                  className="relative group h-12 px-8 min-w-[160px] rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground transition-all"
+                  className="relative group h-12 px-8 min-w-[160px] rounded-xl bg-primary/40 hover:bg-primary-foreground text-white transition-all"
                 >
                   <span className="relative z-10 flex items-center gap-2 text-base font-semibold">
                     Get Started
@@ -97,7 +97,7 @@ const HeroSection = () => {
                       <ChevronRight className="w-4 h-4" />
                     </motion.div>
                   </span>
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary to-green-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
+                  <div className="absolute inset-0 rounded-xl  group-hover:opacity-100 transition-opacity duration-300" />
                 </Button>
 
                 {/* Secondary CTA Button */}
