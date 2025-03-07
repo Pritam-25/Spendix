@@ -3,10 +3,9 @@
 import { AccountFormType } from "@/app/lib/schema"
 import prisma from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
-import { Prisma, Transaction } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { serializeTransaction } from "./serialize"
-import { promise } from "zod"
 
 // create account
 export async function createAccount(data: AccountFormType) {

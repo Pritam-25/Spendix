@@ -63,7 +63,7 @@
   * {
     @apply border-border;
   }
-  
+
   html {
     @apply antialiased;
   }
@@ -84,7 +84,8 @@
 }
 
 /* Prevent layout shift during theme switch */
-html, body {
+html,
+body {
   min-height: 100vh;
 }
 
@@ -92,6 +93,7 @@ html, body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

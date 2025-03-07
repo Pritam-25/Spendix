@@ -31,6 +31,7 @@ import { Calendar1Icon, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import ReceiptScanner from "./receiptScanner";
 
 export default function AddTransactionForm({
   accounts,
@@ -99,8 +100,17 @@ export default function AddTransactionForm({
     }
   }, [transactionResult, transactionLoading, router]);
 
+
+    const handleScanComplete = (scannedData: any) =>{
+
+    }
+
   return (
     <form className="space-y-4 " onSubmit={handleSubmit(onSubmit)}>
+
+      {/* AI receipt scanner */}
+      <ReceiptScanner/>
+
       {/* Type */}
       <div>
         <label
