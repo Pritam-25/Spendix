@@ -49,7 +49,6 @@ export default function AddTransactionForm({
     formState: { errors },
     control,
     watch,
-    reset,
     setValue,
   } = useForm<TransactionFormType>({
     resolver: zodResolver(transactionSchema),

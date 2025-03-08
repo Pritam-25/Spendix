@@ -7,12 +7,7 @@ import AnalyticsSection from "./analytics-section";
 import Footer from "./footer";
 
 const HeroSection = () => {
-  const scrollToNextSection = () => {
-    window.scrollTo({
-      top: window.innerHeight,
-      behavior: 'smooth'
-    });
-  };
+  
 
   return (
     <>

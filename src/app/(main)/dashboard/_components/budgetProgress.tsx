@@ -33,9 +33,9 @@ export default function BudgetProgress({
     : 0;
 
   // console.log(initialBudget);
-  console.log(`currentExpense: ${currentExpense}`);
+  // console.log(`currentExpense: ${currentExpense}`);
 
-  console.log(`percentage: ${percentUsed}`);
+  // console.log(`percentage: ${percentUsed}`);
 
   const {
     loading: islLoading,

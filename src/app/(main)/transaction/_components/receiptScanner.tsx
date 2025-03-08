@@ -16,7 +16,6 @@ export default function ReceiptScanner({
     loading: scanReceiptLoading,
     fetchData: scanReceiptFn,
     data: scannedData,
-    error: scanError,
   } = useFetch(scanRecipt);
 
   const handleReceiptScan = async (file: File) => {
@@ -48,7 +47,7 @@ export default function ReceiptScanner({
         toast.success("Receipt scanned successfully");
       }, 0);
     }
-  }, [scanReceiptLoading, scannedData]);
+  }, [scanReceiptLoading, scannedData, onScanComplete]);
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4 bg-primary-foreground rounded-lg shadow-md p-4">

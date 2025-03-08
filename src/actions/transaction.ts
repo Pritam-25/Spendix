@@ -151,7 +151,7 @@ export async function scanRecipt(file: File) {
         const base64String = Buffer.from(arrayBuffer).toString('base64');
 
         // Create a data URL for the image
-        const dataUrl = `data:${file.type};base64,${base64String}`;
+        // const dataUrl = `data:${file.type};base64,${base64String}`;
 
         const prompt = `
         Analyze this receipt image and extract the following information:

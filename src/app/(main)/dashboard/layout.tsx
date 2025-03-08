@@ -1,6 +1,5 @@
 // app/dashboard/layout.tsx
 import { Suspense } from "react";
-import { PulseLoader } from "react-spinners";
 
 export default function DashboardLayout({
   children,

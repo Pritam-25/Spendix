@@ -58,8 +58,6 @@ export default function CreateAccountDrawer({
   });
 
   const {
-    data: newAccount,
-    error,
     fetchData: createAccountFn,
     loading: createAccountLoading,
   } = useFetch<any, [AccountFormType]>(createAccount);

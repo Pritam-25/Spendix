@@ -3,6 +3,8 @@ import AddTransactionForm from "../_components/addTransactionForm";
 import { GetUserAccount } from "@/actions/account";
 import { defaultCategories } from "@/data/categories";
 
+export const dynamic = 'force-dynamic'; // Add this line
+
 const AddTransactionPage = async () => {
   const accounts = await GetUserAccount();
   return (
@@ -15,5 +17,4 @@ const AddTransactionPage = async () => {
     </div>
   );
 };
-
 export default AddTransactionPage;

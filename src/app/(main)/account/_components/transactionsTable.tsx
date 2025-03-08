@@ -13,12 +13,9 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
-  Delete,
-  DeleteIcon,
   MoreHorizontal,
   RefreshCw,
   Search,
-  Trash,
   Trash2,
   X,
 } from "lucide-react";
@@ -47,7 +44,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";

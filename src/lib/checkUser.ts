@@ -31,7 +31,7 @@ export const checkUser = async () => {
             }
         })
 
-        console.log(`email address is: ${user.emailAddresses}`);
+        console.log(`email address is: ${newUser.email}`);
 
     } catch (error) {
         console.log((error as Error).message);

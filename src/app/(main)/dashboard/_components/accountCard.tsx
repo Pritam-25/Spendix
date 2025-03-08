@@ -45,7 +45,7 @@ export default function AccountCard({ account }: { account: Account }) {
         toast.success("Default account updated succesfully");
       }, 0);
     }
-  }, [updateDefaultAccount, updatedAccount]);
+  }, [updatedAccount]);
 
   useEffect(() => {
     if (updatedAccount?.success) {
@@ -55,7 +55,7 @@ export default function AccountCard({ account }: { account: Account }) {
         );
       }, 0);
     }
-  }, [error]);
+  }, [error, updatedAccount?.success]);
 
   return (
     <Card className="hover:shadow-md transition-shadow group relative">
