@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React from "react";
 import { motion } from "framer-motion";
 import { LineChart, PieChart, BarChart2, TrendingUp } from "lucide-react";
@@ -8,11 +8,11 @@ const AnalyticsSection = () => {
   // Define a softer color palette
   const colors = {
     primary: "rgb(var(--primary))",
-    indigo: "#818CF8", // Soft indigo
-    sky: "#7DD3FC", // Soft sky blue
-    rose: "#FDA4AF", // Soft rose
-    amber: "#FCD34D", // Soft amber
-    emerald: "#6EE7B7", // Soft emerald
+    indigo: "#818CF8",    // Soft indigo
+    sky: "#7DD3FC",       // Soft sky blue
+    rose: "#FDA4AF",      // Soft rose
+    amber: "#FCD34D",     // Soft amber
+    emerald: "#6EE7B7"    // Soft emerald
   };
 
   return (
@@ -34,12 +34,8 @@ const AnalyticsSection = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-sky-400">
-              Smart Analytics
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Track your spending patterns with AI-powered insights
-            </p>
+            <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-sky-400">Smart Analytics</h2>
+            <p className="text-muted-foreground text-lg">Track your spending patterns with AI-powered insights</p>
           </motion.div>
 
           {/* Analytics Grid */}
@@ -56,12 +52,8 @@ const AnalyticsSection = () => {
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-semibold mb-1">
-                      Monthly Spending
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Last 30 days activity
-                    </p>
+                    <h3 className="text-xl font-semibold mb-1">Monthly Spending</h3>
+                    <p className="text-sm text-muted-foreground">Last 30 days activity</p>
                   </div>
                   <div className="p-2 rounded-xl bg-indigo-400/10">
                     <LineChart className="w-5 h-5 text-indigo-400" />
@@ -85,12 +77,8 @@ const AnalyticsSection = () => {
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-semibold mb-1">
-                      Budget Overview
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Monthly budget tracking
-                    </p>
+                    <h3 className="text-xl font-semibold mb-1">Budget Overview</h3>
+                    <p className="text-sm text-muted-foreground">Monthly budget tracking</p>
                   </div>
                   <div className="p-2 rounded-xl bg-sky-400/10">
                     <PieChart className="w-5 h-5 text-sky-400" />
@@ -98,38 +86,19 @@ const AnalyticsSection = () => {
                 </div>
 
                 {[
-                  {
-                    category: "Shopping",
-                    spent: 450,
-                    total: 600,
-                    color: colors.indigo,
-                  },
-                  {
-                    category: "Bills",
-                    spent: 850,
-                    total: 1000,
-                    color: colors.sky,
-                  },
-                  {
-                    category: "Entertainment",
-                    spent: 200,
-                    total: 300,
-                    color: colors.rose,
-                  },
+                  { category: "Shopping", spent: 450, total: 600, color: colors.indigo },
+                  { category: "Bills", spent: 850, total: 1000, color: colors.sky },
+                  { category: "Entertainment", spent: 200, total: 300, color: colors.rose }
                 ].map((item, index) => (
                   <div key={index} className="mb-4 last:mb-0">
                     <div className="flex justify-between text-sm mb-1">
                       <span>{item.category}</span>
-                      <span className="text-muted-foreground">
-                        ${item.spent} / ${item.total}
-                      </span>
+                      <span className="text-muted-foreground">${item.spent} / ${item.total}</span>
                     </div>
                     <div className="h-2 bg-card rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        whileInView={{
-                          width: `${(item.spent / item.total) * 100}%`,
-                        }}
+                        whileInView={{ width: `${(item.spent / item.total) * 100}%` }}
                         transition={{ duration: 1, delay: index * 0.1 }}
                         viewport={{ once: true }}
                         className="h-full"
@@ -153,12 +122,8 @@ const AnalyticsSection = () => {
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-semibold mb-1">
-                      Savings Goals
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Progress tracking
-                    </p>
+                    <h3 className="text-xl font-semibold mb-1">Savings Goals</h3>
+                    <p className="text-sm text-muted-foreground">Progress tracking</p>
                   </div>
                   <div className="p-2 rounded-xl bg-rose-400/10">
                     <TrendingUp className="w-5 h-5 text-rose-400" />
@@ -166,38 +131,19 @@ const AnalyticsSection = () => {
                 </div>
 
                 {[
-                  {
-                    goal: "Emergency Fund",
-                    current: 8000,
-                    target: 10000,
-                    color: colors.amber,
-                  },
-                  {
-                    goal: "Vacation",
-                    current: 2500,
-                    target: 5000,
-                    color: colors.emerald,
-                  },
-                  {
-                    goal: "New Car",
-                    current: 15000,
-                    target: 30000,
-                    color: colors.rose,
-                  },
+                  { goal: "Emergency Fund", current: 8000, target: 10000, color: colors.amber },
+                  { goal: "Vacation", current: 2500, target: 5000, color: colors.emerald },
+                  { goal: "New Car", current: 15000, target: 30000, color: colors.rose }
                 ].map((item, index) => (
                   <div key={index} className="mb-4 last:mb-0">
                     <div className="flex justify-between text-sm mb-1">
                       <span>{item.goal}</span>
-                      <span className="text-muted-foreground">
-                        ${item.current} / ${item.target}
-                      </span>
+                      <span className="text-muted-foreground">${item.current} / ${item.target}</span>
                     </div>
                     <div className="h-2 bg-card rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        whileInView={{
-                          width: `${(item.current / item.target) * 100}%`,
-                        }}
+                        whileInView={{ width: `${(item.current / item.target) * 100}%` }}
                         transition={{ duration: 1, delay: index * 0.1 }}
                         viewport={{ once: true }}
                         className="h-full"
@@ -211,7 +157,7 @@ const AnalyticsSection = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
                 title: "Total Savings",
@@ -270,17 +216,12 @@ const AnalyticsSection = () => {
                   </div>
 
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      {stat.title}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{stat.title}</p>
                     <div className="flex items-center gap-2">
                       <span className="font-semibold">{stat.value}</span>
                       <span
-                        className={`text-xs ${
-                          stat.change.startsWith("+")
-                            ? "text-emerald-400"
-                            : "text-rose-400"
-                        }`}
+                        className={`text-xs ${stat.change.startsWith("+") ? "text-emerald-400" : "text-rose-400"
+                          }`}
                       >
                         {stat.change}
                       </span>
@@ -290,10 +231,11 @@ const AnalyticsSection = () => {
               </motion.div>
             ))}
           </div>
+
         </div>
       </div>
     </div>
   );
 };
 
-export default AnalyticsSection;
+export default AnalyticsSection; 

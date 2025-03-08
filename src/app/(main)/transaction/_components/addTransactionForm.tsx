@@ -29,19 +29,26 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { Calendar1Icon, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import ReceiptScanner from "./receiptScanner";
+import { updateTransaction } from "@/actions/transaction";
 
 export default function AddTransactionForm({
   accounts,
   category,
+  editMode = false,
+  initialData = null,
 }: {
   accounts: Account[];
   category: typeof defaultCategories;
+  editMode: boolean;
+  initialData: any;
 }) {
   // next router
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
 
   const {
     handleSubmit,
@@ -50,26 +57,47 @@ export default function AddTransactionForm({
     control,
     watch,
     setValue,
+    reset,
   } = useForm<TransactionFormType>({
     resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      type: "EXPENSE",
-      amount: "",
-      description: "",
-      category: "",
-      accountId:
-        accounts.find((account: Account) => account.isDefault)?.id || "",
-      date: new Date(),
-      isRecurring: false,
-      recurringInterval: RecurringInterval.MONTHLY, // Default recurring interval
-    },
+    defaultValues:
+      editMode && initialData
+        ? {
+            type: initialData.type,
+            amount: initialData.amount.toString(),
+            description: initialData.description,
+            accountId: initialData.accountId,
+            category: initialData.category,
+            date: new Date(initialData.date),
+            isRecurring: initialData.isRecurring,
+            ...(initialData.recurringInterval && {
+              recurringInterval: initialData.recurringInterval,
+            }),
+          }
+        : {
+            type: "EXPENSE",
+            amount: "",
+            description: "",
+            category: "",
+            accountId:
+              accounts.find((account: Account) => account.isDefault)?.id || "",
+            date: new Date(),
+            isRecurring: false,
+            recurringInterval: RecurringInterval.MONTHLY, // Default recurring interval
+          },
   });
+
+  const createOrUpdateFunction = (idOrData: string | any, data?: any) => {
+    return editMode
+      ? updateTransaction(idOrData as string, data)
+      : createTransaction(idOrData);
+  };
 
   const {
     fetchData: transactionFn,
     loading: transactionLoading,
     data: transactionResult,
-  } = useFetch(createTransaction);
+  } = useFetch(createOrUpdateFunction);
 
   const [date, setDate] = React.useState<Date | undefined>(new Date());
 
@@ -83,22 +111,30 @@ export default function AddTransactionForm({
   const onSubmit = async (data: TransactionFormType) => {
     const formData = {
       ...data,
-      amount: data.amount.toString(), // Convert to string
+      amount: data.amount.toString(),
     };
 
-    transactionFn(formData);
+    if (editMode) {
+      transactionFn(editId, formData);
+    } else {
+      transactionFn(formData);
+    }
   };
 
   useEffect(() => {
     if (transactionResult?.success && !transactionLoading) {
       setTimeout(() => {
-        toast.success("Transaction created successfully.");
+        toast.success(
+          editMode
+            ? "Transaction updated successfully"
+            : "Transaction created successfully"
+        );
       }, 0); // Slight delay
-
+      reset();
       router.refresh(); // Ensure the page updates
       router.push(`/account/${transactionResult.data.accountId}`);
     }
-  }, [transactionResult, transactionLoading, router]);
+  }, [transactionResult, transactionLoading, router, editMode]);
 
   const handleScanComplete = (scannedData: any) => {
     if (scannedData) {
@@ -116,7 +152,7 @@ export default function AddTransactionForm({
   return (
     <form className="space-y-4 " onSubmit={handleSubmit(onSubmit)}>
       {/* AI receipt scanner */}
-      <ReceiptScanner onScanComplete={handleScanComplete} />
+      {!editMode && <ReceiptScanner onScanComplete={handleScanComplete} />}
 
       {/* Type */}
       <div>
@@ -404,8 +440,10 @@ export default function AddTransactionForm({
           {transactionLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating Transaction...
+              {editMode ? "Updating Transaction..." : "Creating Transaction..."}
             </>
+          ) : editMode ? (
+            "Update Transaction"
           ) : (
             "Create Transaction"
           )}
