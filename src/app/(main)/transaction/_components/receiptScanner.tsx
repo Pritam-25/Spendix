@@ -4,16 +4,28 @@ import { Button } from "@/components/ui/button";
 import { CameraIcon, Loader2 } from "lucide-react";
 import { useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
-import { ScannerProps, ScannedReceipt } from "@/types/receipt";
 
-export default function ReceiptScanner({ onScanComplete }: ScannerProps) {
+interface ScannedReceipt {
+  amount?: string | number;
+  date?: string | Date;
+  description?: string;
+  category?: string;
+}
+
+interface ReceiptScannerProps {
+  onScanComplete: (data: ScannedReceipt) => void;
+}
+
+export default function ReceiptScanner({
+  onScanComplete,
+}: ReceiptScannerProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     loading: scanReceiptLoading,
     fetchData: scanReceiptFn,
     data: scannedData,
-  } = useFetch<ScannedReceipt>();
+  } = useFetch<ScannedReceipt, [File]>(scanRecipt);
 
   const handleReceiptScan = async (file: File) => {
     try {
@@ -33,7 +45,7 @@ export default function ReceiptScanner({ onScanComplete }: ScannerProps) {
       }
 
       console.log("Starting receipt scan with file:", file.name);
-      await scanReceiptFn(scanRecipt, file);
+      await scanReceiptFn(file);
     } catch (error) {
       console.error("Error scanning receipt:", error);
       setTimeout(() => {
@@ -58,7 +70,7 @@ export default function ReceiptScanner({ onScanComplete }: ScannerProps) {
   }, [handleScanComplete]);
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-4 bg-primary-foreground rounded-lg shadow-md p-4">
+    <>
       <input
         type="file"
         ref={fileInputRef}
@@ -69,27 +81,27 @@ export default function ReceiptScanner({ onScanComplete }: ScannerProps) {
           const file = e.target.files?.[0];
           if (file) handleReceiptScan(file);
           // Clear the input value to allow scanning the same file again
-          e.target.value = '';
+          e.target.value = "";
         }}
       />
 
       <Button
         onClick={() => fileInputRef.current?.click()}
-        className="w-full flex items-center bg-primary-foreground justify-center gap-2 text-white font-medium rounded-lg transition-all hover:bg-primary/90 active:scale-95"
+        className="w-full py-6 h-auto flex items-center justify-center gap-3 bg-secondary hover:bg-secondary/90 text-lg font-medium rounded-lg shadow-md border-2 border-dashed mb-10"
         disabled={scanReceiptLoading}
       >
         {scanReceiptLoading ? (
           <>
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-6 w-6 animate-spin" />
             <span>Scanning...</span>
           </>
         ) : (
           <>
-            <CameraIcon className="h-5 w-5" />
-            <span>Scan Receipt</span>
+            <CameraIcon className="h-12 w-12 text-black dark:text-white " />
+            <span className="text-black dark:text-white">Scan Receipt</span>
           </>
         )}
       </Button>
-    </div>
+    </>
   );
 }

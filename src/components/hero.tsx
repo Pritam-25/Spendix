@@ -57,7 +57,7 @@ const HeroSection = () => {
                 transition={{ delay: 0.3, duration: 0.8 }}
                 className="font-extrabold text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight"
               >
-                <span className="inline-block bg-clip-text text-transparent bg-gradient-to-t from-green-700 to-green-500 dark:from-green-500 dark:to-green-300">
+                <span className="inline-block bg-clip-text text-transparent bg-gradient-to-t from-emerald-600 to-emerald-400 dark:from-emerald-800 dark:via-emerald-500 dark:to-emerald-300">
                   Track Your Finances
                 </span>
                 <br />
@@ -81,7 +81,7 @@ const HeroSection = () => {
                 className="flex gap-4 justify-center items-center mt-8"
               >
                 {/* Primary CTA Button */}
-                <Button className="relative group h-12 px-8 min-w-[160px] rounded-xl bg-primary/40 hover:bg-primary-foreground text-white transition-all">
+                <Button className="relative group h-12 px-8 min-w-[160px] rounded-xl text-white transition-all bg-gradient-to-r from-emerald-700 to-emerald-500  hover:from-emerald-800 hover:to-emerald-600 dark:from-emerald-900 dark:to-emerald-700 dark:hover:from-emerald-800 dark:hover:to-emerald-600 shadow-md hover:shadow-lg">
                   <span className="relative z-10 flex items-center gap-2 text-base font-semibold">
                     Get Started
                     <motion.div

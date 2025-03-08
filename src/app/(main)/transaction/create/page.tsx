@@ -17,8 +17,11 @@ const AddTransactionPage = async ({
 }) => {
   const accounts = await GetUserAccount();
 
-  const editId = searchParams?.edit || null;
-  console.log(`edit id: ${editId}`);
+  const resolvedSearchParams = await searchParams;
+  console.log("Resolved Search Params:", resolvedSearchParams);
+
+  const editId = resolvedSearchParams?.edit;
+  console.log(`Edit ID: ${editId}`);
 
   let initialData = null;
   if (editId) {
@@ -28,7 +31,7 @@ const AddTransactionPage = async ({
 
   return (
     <div className="max-w-3xl w-full px-4 mx-auto ">
-      <h1 className="text-primary text-5xl font-extrabold mb-10">
+      <h1 className="text-center text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-green-500 bg-clip-text text-transparent mb-10">
         {editId ? "Edit" : "Add"} Transaction
       </h1>
       <AddTransactionForm

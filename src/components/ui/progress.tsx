@@ -12,10 +12,10 @@ const Progress = React.forwardRef<
   // Determine progress bar color dynamically
   const progressColor =
     value && value >= 90
-      ? "bg-red-500"
+      ? "bg-rose-500"
       : value && value >= 75
-      ? "bg-yellow-500"
-      : "bg-green-500";
+      ? "bg-amber-400"
+      : "bg-primary";
 
   return (
     <ProgressPrimitive.Root

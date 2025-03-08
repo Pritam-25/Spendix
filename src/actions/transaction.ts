@@ -137,15 +137,7 @@ export async function scanRecipt(file: File) {
             throw new Error("Gemini API key is not defined.");
         }
 
-        // Debug log
-        console.log("Starting receipt scan with file:", {
-            name: file.name,
-            type: file.type,
-            size: file.size
-        });
-
         const genAI = new GoogleGenerativeAI(geminiApiKey);
-        // Using the free model
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // Convert file to base64 and create parts array
@@ -213,7 +205,6 @@ export async function scanRecipt(file: File) {
                 date: data.date ? new Date(data.date) : new Date(),
                 description: data.description || "",
                 category: data.category || "other-expense",
-                merchantName: data.merchantName || ""
             };
 
         } catch (parseError) {

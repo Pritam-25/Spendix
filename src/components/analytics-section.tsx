@@ -1,10 +1,10 @@
 "use client"
-import React from "react";
+import React, { ReactElement } from "react";
 import { motion } from "framer-motion";
 import { LineChart, PieChart, BarChart2, TrendingUp } from "lucide-react";
 import MiniChart from "./ui/mini-chart";
 
-const AnalyticsSection = () => {
+const AnalyticsSection = (): ReactElement => {
   // Define a softer color palette
   const colors = {
     primary: "rgb(var(--primary))",
@@ -157,7 +157,7 @@ const AnalyticsSection = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
               {
                 title: "Total Savings",

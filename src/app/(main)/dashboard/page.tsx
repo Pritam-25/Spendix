@@ -37,7 +37,7 @@ async function DashboardPage() {
       {/* Accounts Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 ">
         <CreateAccountDrawer>
-          <Card className="hover:shadow-md transition-shadow bg-primary-foreground cursor-pointer border-2 h-full flex justify-center items-center">
+          <Card className="hover:shadow-md transition-shadow bg-secondary cursor-pointer border-2 border-dashed  h-full flex justify-center items-center pt-8 pb-4">
             <CardContent className="flex flex-col items-center justify-center text-muted-foreground">
               <Plus className="h-10 w-10 mb-2 text-center" />
               <p className="text-sm font-medium">Add New Account</p>
