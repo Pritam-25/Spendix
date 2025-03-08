@@ -122,7 +122,6 @@ export async function createTransaction(data: TransactionFormType) {
     }
 }
 
-
 // *  <====  Scan Receipt with gemini api ===>
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -235,3 +234,29 @@ export async function scanRecipt(file: File) {
         throw new Error("Failed to scan receipt. Please try again.");
     }
 }
+
+
+//* get the transaction for edit transaction ==>
+export async function getTransaction(id: string) {
+    const { userId } = await auth()
+    if (!userId) throw new Error("Unauthorized")
+
+    const user = await prisma.user.findUnique({
+        where: { clerkUserId: userId }
+    })
+
+    if (!user) {
+        throw new Error("User not found")
+    }
+
+    const transaction = prisma.transaction.findUnique({
+        where: { id, userId: user.id }
+
+    })
+
+    if (!transaction) throw new Error(
+        "Transaction not found"
+    )
+    return serializeTransaction(transaction)
+}
+
