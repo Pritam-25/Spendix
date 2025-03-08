@@ -61,13 +61,13 @@ export default function ReceiptScanner({
         toast.success("Receipt scanned successfully");
       }, 0);
     }
-  }, [scannedData, scanReceiptLoading, onScanComplete]);
+  }, [scannedData]);
 
   useEffect(() => {
     if (scannedData && !scanReceiptLoading) {
       handleScanComplete();
     }
-  }, [handleScanComplete]);
+  }, [handleScanComplete, scanReceiptLoading, scannedData]);
 
   return (
     <>

@@ -1,8 +1,6 @@
 import prisma from "@/lib/prisma";
 import { inngest } from "./client";
-import { eventNames } from "process";
 import { RecurringInterval, Transaction } from "@prisma/client";
-import { createTransaction } from "@/actions/transaction";
 
 export const checkBudgetAlert = inngest.createFunction(
     {
