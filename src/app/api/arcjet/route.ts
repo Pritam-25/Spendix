@@ -11,7 +11,7 @@ const aj = arcjet({
             mode: "LIVE",
             refillRate: 2, // Refill 10 tokens per interval
             interval: 3600, // Refill every 1 hour 
-            capacity: 2, // Bucket capacity of 10 tokens
+            capacity: 10, // Bucket capacity of 10 tokens
         }),
     ],
 });

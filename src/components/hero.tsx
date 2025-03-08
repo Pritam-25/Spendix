@@ -134,7 +134,7 @@ const HeroSection = () => {
                   icon: <Bell className="w-6 h-6 text-amber-400" />,
                   title: "Intelligent Alerts",
                   description: "Receive smart notifications about your financial health and opportunities",
-                  bgColor: "bg-primary/5",
+                  bgColor: "bg-amber-400/5",
                   borderColor: "hover:border-amber-400/20",
                   gradient: "from-amber-400/5"
                 }

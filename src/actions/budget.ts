@@ -4,6 +4,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 import prisma from "@/lib/prisma"
+import { json } from "stream/consumers"
 
 
 export async function getCurrentBudget(accountId: string) {
@@ -60,10 +61,15 @@ export async function getCurrentBudget(accountId: string) {
             }
         )
 
+        console.log(`expense: ${JSON.stringify(expense)}`);
+        
+        
+        
         return {
             budget: budget ? { ...budget, amount: budget.amount.toNumber() } : null,
-            currentExpense: expense._sum.amount ? expense._sum.amount?.toNumber() : 0
+            currentExpense: expense._sum.amount?.toNumber() ?? 0
         }
+        
 
 
     } catch (error) {

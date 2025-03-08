@@ -5,7 +5,7 @@ import { createTransaction } from "@/actions/transaction";
 import useFetch from "@/app/hooks/useFetch";
 import { TransactionFormType, transactionSchema } from "@/app/lib/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Account, RecurringInterval, Transaction } from "@prisma/client";
+import { Account, RecurringInterval } from "@prisma/client";
 import { Controller, useForm } from "react-hook-form";
 
 import {
@@ -50,6 +50,7 @@ export default function AddTransactionForm({
     control,
     watch,
     reset,
+    setValue,
   } = useForm<TransactionFormType>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
@@ -100,16 +101,23 @@ export default function AddTransactionForm({
     }
   }, [transactionResult, transactionLoading, router]);
 
-
-    const handleScanComplete = (scannedData: any) =>{
-
+  const handleScanComplete = (scannedData: any) => {
+    if (scannedData) {
+      setValue("amount", scannedData.amount.toString());
+      setValue("date", new Date(scannedData.date));
+      if (scannedData.description) {
+        setValue("description", scannedData.description);
+      }
+      if (scannedData.category) {
+        setValue("category", scannedData.category);
+      }
     }
+  };
 
   return (
     <form className="space-y-4 " onSubmit={handleSubmit(onSubmit)}>
-
       {/* AI receipt scanner */}
-      <ReceiptScanner/>
+      <ReceiptScanner onScanComplete={handleScanComplete} />
 
       {/* Type */}
       <div>
@@ -253,9 +261,7 @@ export default function AddTransactionForm({
           />
         </div>
         {errors.category && (
-          <p className="text-sm text-red-500 mt-1">
-            {errors.category.message}
-          </p>
+          <p className="text-sm text-red-500 mt-1">{errors.category.message}</p>
         )}
       </div>
 

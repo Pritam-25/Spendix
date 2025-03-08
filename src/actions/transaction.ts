@@ -123,72 +123,115 @@ export async function createTransaction(data: TransactionFormType) {
 }
 
 
-// *  <====  Scan Recipt with gemini api ===>
+// *  <====  Scan Receipt with gemini api ===>
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import fs from "fs";
 
-
-export async function scanRecipt(file: any) {
+export async function scanRecipt(file: File) {
     try {
         const geminiApiKey = process.env.GEMINI_API_KEY;
 
         if (!geminiApiKey) {
+            console.error("Gemini API key is missing");
             throw new Error("Gemini API key is not defined.");
         }
+
+        // Debug log
+        console.log("Starting receipt scan with file:", {
+            name: file.name,
+            type: file.type,
+            size: file.size
+        });
+
         const genAI = new GoogleGenerativeAI(geminiApiKey);
+        // Using the free model
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
+        // Convert file to base64 and create parts array
+        const arrayBuffer = await file.arrayBuffer();
+        const base64String = Buffer.from(arrayBuffer).toString('base64');
+
+        // Create a data URL for the image
+        const dataUrl = `data:${file.type};base64,${base64String}`;
 
         const prompt = `
-        Analyze this receipt image and extract the following information in JSON format:
-        - Total amount (just the number)
-        - Date (in ISO format)
-        - Description or items purchased (brief summary)
-        - Merchant/store name
-        - Suggested category (one of: housing,transportation,groceries,utilities,entertainment,food,shopping,healthcare,education,personal,travel,insurance,gifts,bills,other-expense )
-        
-        Only respond with valid JSON in this exact format:
+        Analyze this receipt image and extract the following information:
+        - Total amount (number only, found after "Total" or "Amount Due")
+        - Date (in YYYY-MM-DD format)
+        - Brief description of purchase
+        - Store/merchant name
+        - Category (choose one: housing, transportation, groceries, utilities, entertainment, food, shopping, healthcare, education, personal, travel, insurance, gifts, bills, other-expense)
+
+        Format the response as JSON:
         {
           "amount": number,
-          "date": "ISO date string",
+          "date": "YYYY-MM-DD",
           "description": "string",
           "merchantName": "string",
           "category": "string"
         }
-  
-        If its not a recipt, return an empty object
-      `;
 
-        const image = {
-            inlineData: {
-                data: Buffer.from(fs.readFileSync(file)).toString("base64"),
-                mimeType: file.type,
-            },
-        };
+        If you can't read the receipt, return: {}
+        `;
 
-        const result = await model.generateContent([prompt, image]);
+        // Debug log
+        console.log("Sending request to Gemini API");
 
-        const text = result.response.text();
-        const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
-
-        console.log(cleanedText);
-
+        // Create parts array with prompt and image
+        const parts = [
+            { text: prompt },
+            {
+                inlineData: {
+                    mimeType: file.type,
+                    data: base64String
+                }
+            }
+        ];
 
         try {
+            const result = await model.generateContent(parts);
+            const response = await result.response;
+            const text = response.text();
+
+            // Debug log
+            console.log("Received response from Gemini API:", text);
+
+            // Clean and parse the response
+            const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
             const data = JSON.parse(cleanedText);
-            return {
-                amount: parseFloat(data.amount),
-                date: new Date(data.date),
-                description: data.description,
-                category: data.category,
-                merchantNmae: data.merchantName
+
+            // Validate the parsed data
+            if (Object.keys(data).length === 0) {
+                throw new Error("No receipt data could be extracted from the image");
             }
+
+            // Debug log
+            console.log("Parsed receipt data:", data);
+
+            // Return with fallback values
+            return {
+                amount: parseFloat(data.amount) || 0,
+                date: data.date ? new Date(data.date) : new Date(),
+                description: data.description || "",
+                category: data.category || "other-expense",
+                merchantName: data.merchantName || ""
+            };
+
         } catch (parseError) {
-            console.error("Error parsing JSON response: ", parseError);
-            throw new Error("Invalid response format from Gemini")
+            console.error("Error processing receipt:", parseError);
+            throw new Error("Could not process receipt image. Please try again with a clearer image.");
         }
 
     } catch (error) {
-        throw new Error("Failed to scan receipt")
+        console.error("Receipt scanning error:", error);
+        if (error instanceof Error) {
+            if (error.message.includes('429')) {
+                throw new Error("Too many requests. Please try again later.");
+            }
+            if (error.message.includes('413')) {
+                throw new Error("Image file is too large. Please use a smaller image.");
+            }
+            throw new Error(error.message);
+        }
+        throw new Error("Failed to scan receipt. Please try again.");
     }
 }

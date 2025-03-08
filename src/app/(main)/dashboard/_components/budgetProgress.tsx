@@ -32,6 +32,11 @@ export default function BudgetProgress({
     ? (currentExpense / initialBudget.amount) * 100
     : 0;
 
+  // console.log(initialBudget);
+  console.log(`currentExpense: ${currentExpense}`);
+
+  console.log(`percentage: ${percentUsed}`);
+
   const {
     loading: islLoading,
     fetchData: updateBudgetFn,
@@ -80,7 +85,9 @@ export default function BudgetProgress({
     <Card className="mb-10">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex-1">
-          <CardTitle className="text-md font-medium">Monthly Budget (Default Account)</CardTitle>
+          <CardTitle className="text-md font-medium">
+            Monthly Budget (Default Account)
+          </CardTitle>
           <div className="flex items-center gap-2 mt-1 pt-3">
             {isEditing ? (
               <div className="flex gap-4">
@@ -92,9 +99,9 @@ export default function BudgetProgress({
                   placeholder="Enter amount"
                   autoFocus
                   disabled={islLoading}
-                  onKeyDown={(e)=>{
-                    if(e.key === "Enter"){
-                        handleUpdateChange() // call update function when enter is press
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleUpdateChange(); // call update function when enter is press
                     }
                   }}
                 />
@@ -114,7 +121,9 @@ export default function BudgetProgress({
               <>
                 <CardDescription className="text-base font-medium">
                   {initialBudget
-                    ? `Spent  $${currentExpense.toFixed(2)} of $${initialBudget.amount.toFixed(2)}`
+                    ? `Spent  $${currentExpense.toFixed(
+                        2
+                      )} of $${initialBudget.amount.toFixed(2)}`
                     : "No budget set"}
                 </CardDescription>
                 <Button
@@ -131,9 +140,11 @@ export default function BudgetProgress({
         </div>
       </CardHeader>
       <CardContent>
-        <Progress value={percentUsed} className="h-2"/>
+        <Progress value={percentUsed} className="h-2" />
         <div className="flex justify-end mt-1">
-          <p className="text-xs text-muted-foreground">{percentUsed.toFixed(1)}% used</p>
+          <p className="text-xs text-muted-foreground">
+            {percentUsed.toFixed(1)}% used
+          </p>
         </div>
       </CardContent>
     </Card>
