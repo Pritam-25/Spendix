@@ -8,6 +8,7 @@ import { serializeTransaction } from "./serialize";
 import { request } from "@arcjet/next";
 import aj from "@/app/api/arcjet/route";
 import { TransactionFormType } from "@/app/lib/schema";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function createTransaction(data: TransactionFormType) {
     try {
@@ -67,29 +68,6 @@ export async function createTransaction(data: TransactionFormType) {
         const balanceChange = data.type === "EXPENSE" ? -data.amount : data.amount;
         const newBalance = Number(account.balance) + Number(balanceChange);
 
-        // Function to calculate next recurring date
-        function calculateNextRecurringDate(startDate: Date, interval: RecurringInterval) {
-            const date = new Date(startDate);
-
-            switch (interval) {
-                case RecurringInterval.DAILY:
-                    date.setDate(date.getDate() + 1);
-                    break;
-                case RecurringInterval.WEEKLY:
-                    date.setDate(date.getDate() + 7);
-                    break;
-                case RecurringInterval.MONTHLY:
-                    date.setMonth(date.getMonth() + 1);
-                    break;
-                case RecurringInterval.YEARLY:
-                    date.setFullYear(date.getFullYear() + 1);
-                    break;
-                default:
-                    break;
-            }
-
-            return date;
-        }
 
         const transaction = await prisma.$transaction(async (tx) => {
             const newTransaction = await tx.transaction.create({
@@ -122,9 +100,34 @@ export async function createTransaction(data: TransactionFormType) {
     }
 }
 
-// *  <====  Scan Receipt with gemini api ===>
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
+
+//* Function to calculate next recurring date
+function calculateNextRecurringDate(startDate: Date, interval: RecurringInterval) {
+    const date = new Date(startDate);
+
+    switch (interval) {
+        case RecurringInterval.DAILY:
+            date.setDate(date.getDate() + 1);
+            break;
+        case RecurringInterval.WEEKLY:
+            date.setDate(date.getDate() + 7);
+            break;
+        case RecurringInterval.MONTHLY:
+            date.setMonth(date.getMonth() + 1);
+            break;
+        case RecurringInterval.YEARLY:
+            date.setFullYear(date.getFullYear() + 1);
+            break;
+        default:
+            break;
+    }
+
+    return date;
+}
+
+
+// *  <====  Scan Receipt with gemini api ===>
 export async function scanRecipt(file: File) {
     try {
         const geminiApiKey = process.env.GEMINI_API_KEY;
@@ -176,18 +179,17 @@ export async function scanRecipt(file: File) {
         console.log("Sending request to Gemini API");
 
         // Create parts array with prompt and image
-        const parts = [
-            { text: prompt },
+        const result = await model.generateContent([
+            prompt,
             {
                 inlineData: {
                     mimeType: file.type,
                     data: base64String
                 }
             }
-        ];
+        ]);
 
         try {
-            const result = await model.generateContent(parts);
             const response = await result.response;
             const text = response.text();
 
@@ -206,7 +208,6 @@ export async function scanRecipt(file: File) {
             // Debug log
             console.log("Parsed receipt data:", data);
 
-            // Return with fallback values
             return {
                 amount: parseFloat(data.amount) || 0,
                 date: data.date ? new Date(data.date) : new Date(),
@@ -260,3 +261,76 @@ export async function getTransaction(id: string) {
     return serializeTransaction(transaction)
 }
 
+//* update Transaction
+export async function updateTransaction(id: string, data: any) {
+    try {
+        const { userId } = await auth();
+        if (!userId) throw new Error("Unauthorized");
+
+        const user = await prisma.user.findUnique({
+            where: { clerkUserId: userId },
+        });
+
+        if (!user) throw new Error("User not found");
+
+        // Get original transaction to calculate balance change
+        const originalTransaction = await prisma.transaction.findUnique({
+            where: {
+                id,
+                userId: user.id,
+            },
+            include: {
+                account: true,
+            },
+        });
+
+        if (!originalTransaction) throw new Error("Transaction not found");
+
+        // Calculate balance changes
+        const oldBalanceChange =
+            originalTransaction.type === "EXPENSE"
+                ? -originalTransaction.amount.toNumber()
+                : originalTransaction.amount.toNumber();
+
+        const newBalanceChange =
+            data.type === "EXPENSE" ? -data.amount : data.amount;
+
+        const netBalanceChange = newBalanceChange - oldBalanceChange;
+
+        // Update transaction and account balance in a transaction
+        const transaction = await prisma.$transaction(async (tx) => {
+            const updated = await tx.transaction.update({
+                where: {
+                    id,
+                    userId: user.id,
+                },
+                data: {
+                    ...data,
+                    nextRecurringDate:
+                        data.isRecurring && data.recurringInterval
+                            ? calculateNextRecurringDate(data.date, data.recurringInterval)
+                            : null,
+                },
+            });
+
+            // Update account balance
+            await tx.account.update({
+                where: { id: data.accountId },
+                data: {
+                    balance: {
+                        increment: netBalanceChange,
+                    },
+                },
+            });
+
+            return updated;
+        });
+
+        revalidatePath("/dashboard");
+        revalidatePath(`/account/${data.accountId}`);
+
+        return { success: true, data: serializeTransaction(transaction) };
+    } catch (error) {
+        throw new Error((error as Error).message);
+    }
+} 
