@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { inngest } from "./client";
 import { RecurringInterval, Transaction } from "@prisma/client";
 import { sendEmail } from "@/actions/send-eamil";
-import { EmailTemplate } from "../../../emails/my-email";
+import  EmailTemplate  from "../../../emails/my-email";
 
 export const checkBudgetAlert = inngest.createFunction(
     {
@@ -10,90 +10,114 @@ export const checkBudgetAlert = inngest.createFunction(
         name: "Check Budget Alerts",
     },
     { cron: "0 0 * * *" },   // Run Every Day at Midnight (12:00 AM)
+    async ({ step, event }) => {
+        try {
+            function isNewMonth(lastAlertDate: Date, currentDate: Date) {
+                return (
+                    lastAlertDate.getMonth() !== currentDate.getMonth() || lastAlertDate.getFullYear() !== currentDate.getFullYear()
+                )
+            }
 
-    async ({ step }) => {
-
-        function isNewMonth(lastAlertDate: Date, currentDate: Date) {
-            return (
-                lastAlertDate.getMonth() !== currentDate.getMonth() || lastAlertDate.getFullYear() !== currentDate.getFullYear()
-            )
-        }
-
-
-        const budgets = await step.run("fetch-budget", async () => {
-            return await prisma.budget.findMany({
-                include: {
-                    user: {
-                        include: {
-                            accounts: {
-                                where: { isDefault: true }
+            const budgets = await step.run("fetch-budget", async () => {
+                return await prisma.budget.findMany({
+                    include: {
+                        user: {
+                            include: {
+                                accounts: {
+                                    where: { isDefault: true }
+                                }
                             }
                         }
                     }
-                }
-            });
-        });
-
-        for (const budget of budgets) {
-            const defaultAccount = budget?.user?.accounts?.[0] || null;
-            if (!defaultAccount) continue;
-
-            await step.run(`check-budget-${budget.id}`, async () => {
-                const startDate = new Date();
-                startDate.setDate(1); // Start of current month
-
-                // Calculate total expenses for the default account only
-                const expenses = await prisma.transaction.aggregate({
-                    where: {
-                        userId: budget.userId,
-                        accountId: defaultAccount.id, // Only consider default account
-                        type: "EXPENSE",
-                        date: {
-                            gte: startDate,
-                        },
-                    },
-                    _sum: {
-                        amount: true,
-                    },
                 });
+            });
 
-                const totalExpenses = expenses._sum.amount?.toNumber() || 0;
-                const budgetAmount = Number(budget.amount) || 1; // Prevent division by zero
-                const percentageUsed = (totalExpenses / budgetAmount) * 100;
+            const results = [];
 
+            for (const budget of budgets) {
+                const defaultAccount = budget?.user?.accounts?.[0] || null;
+                if (!defaultAccount) continue;
 
+                const result = await step.run(`check-budget-${budget.id}`, async () => {
+                    const startDate = new Date();
+                    startDate.setDate(1); // Start of current month
 
+                    // Calculate total expenses for the default account only
+                    const expenses = await prisma.transaction.aggregate({
+                        where: {
+                            userId: budget.userId,
+                            accountId: defaultAccount.id,
+                            type: "EXPENSE",
+                            date: {
+                                gte: startDate,
+                            },
+                        },
+                        _sum: {
+                            amount: true,
+                        },
+                    });
 
-                if (percentageUsed >= 80 && (!budget.lastAlertSent || isNewMonth(new Date(budget.lastAlertSent), new Date()))) {
-                    // send email
-                    await sendEmail({
-                        to: budget.user.email,
-                        subject: `Budget Alert for ${defaultAccount.name}`,
-                        react: EmailTemplate({
+                    const totalExpenses = expenses._sum.amount?.toNumber() || 0;
+                    const budgetAmount = Number(budget.amount) || 1;
+                    const percentageUsed = (totalExpenses / budgetAmount) * 100;
+
+                    console.log(`Checking budget for user ${budget.user.name} (${percentageUsed.toFixed(1)}% used)`);
+
+                    if (percentageUsed >= 80) {
+                        console.log(`Sending budget alert email for user ${budget.user.name}`);
+
+                        const emailTemplate = EmailTemplate({
                             userName: budget.user.name,
                             type: "budget-alert",
                             data: {
                                 percentageUsed,
-                                budgetAmount: parseInt(budgetAmount.toFixed(1)),
-                                totalExpenses: parseInt(totalExpenses.toFixed(1)),
+                                budgetAmount: Number(budgetAmount),
+                                totalExpenses: Number(totalExpenses),
                                 accountName: defaultAccount.name
                             }
-                        })
-                    })
+                        });
 
-                    // update last AlertSent
-                    await prisma.budget.update({
-                        where: { id: budget.id },
-                        data: { lastAlertSent: new Date() }
-                    })
-                }
-            });
+                        if (!emailTemplate) {
+                            console.error("Failed to generate email template");
+                            return { success: false, error: "Failed to generate email template" };
+                        }
+
+                        try {
+                            const emailResult = await sendEmail({
+                                to: budget.user.email,
+                                subject: `Budget Alert: ${percentageUsed.toFixed(1)}% of your ${defaultAccount.name} budget used`,
+                                react: emailTemplate
+                            });
+
+                            if (emailResult.success) {
+                                console.log(`Budget alert email sent successfully to ${budget.user.email}`);
+                                await prisma.budget.update({
+                                    where: { id: budget.id },
+                                    data: { lastAlertSent: new Date() }
+                                });
+                                return { success: true, message: `Email sent to ${budget.user.email}` };
+                            } else {
+                                console.error(`Failed to send budget alert email to ${budget.user.email}:`, emailResult.error);
+                                return { success: false, error: emailResult.error };
+                            }
+                        } catch (error) {
+                            console.error(`Error sending email to ${budget.user.email}:`, error);
+                            return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+                        }
+                    }
+                    return { success: true, message: "Budget within limits" };
+                });
+
+                results.push(result);
+            }
+
+            return { success: true, results };
+        } catch (error) {
+            console.error("Error in checkBudgetAlert:", error);
+            return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
         }
-
-
-    },
+    }
 );
-
 
 
 export const triggerRecurringTransactions = inngest.createFunction(

@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import {
   Body,
   Column,
@@ -27,25 +29,164 @@ interface Data {
   percentageUsed?: number;
   budgetAmount?: number;
   totalExpenses?: number;
-  accountName: string
+  accountName?: string;
 }
 
 export interface EmailTemplateProps {
   userName: string;
-  type: string;
+  type: "monthly-report" | "budget-alert";
   data: Data;
 }
 
-export const EmailTemplate = ({
+const EmailTemplate = ({
   userName = "",
   type = "monthly-report",
   data = {} as Data,
-}) => {
-  // Modern green color as specified (HSL: 156.6, 97.6%, 24.3%)
+}: EmailTemplateProps): React.ReactElement => {
   const primaryGreen = "hsl(156.6, 97.6%, 24.3%)";
-  const primaryGreenRGB = "22, 163, 74";
-  const primaryGreenLight = "hsl(156.6, 97.6%, 35%)";
-  const primaryGreenDark = "hsl(156.6, 97.6%, 15%)";
+  const yellowColor = "#FFD700";
+  const darkYellowBackground = "rgba(255, 193, 7, 0.1)"; // Slightly dark yellow background
+
+  if (type === "budget-alert") {
+    const remainingAmount =
+      (data?.budgetAmount ?? 0) - (data?.totalExpenses ?? 0);
+    const isWarning = (data?.percentageUsed ?? 0) > 80;
+    const progressWidth = Math.min(data?.percentageUsed ?? 0, 100);
+    const progressColor = isWarning ? "#ef4444" : "#10b981";
+
+    return (
+      <Html>
+        <Head>
+          <style>
+            {`
+              @media (min-width: 640px) {
+                .container { max-width: 600px !important; }
+                .percentage { font-size: 3.5rem !important; }
+                .card-amount { font-size: 1.75rem !important; }
+              }
+            `}
+          </style>
+        </Head>
+        <Preview>Spendix Budget Alert</Preview>
+        <Tailwind>
+          <Body className="bg-black font-sans">
+            <Container className="mx-auto w-full max-w-[440px] p-0">
+              {/* Header Section */}
+              <Section className="px-4 py-6 text-center">
+                <h1 className="text-primary font-bold text-4xl">SPENDIX</h1>
+                <Text className="text-sm font-medium uppercase tracking-wider text-emerald-400">
+                  BUDGET ALERT
+                </Text>
+                <Text className="text-base text-gray-300 mt-4">
+                  Hello {userName}, we have an update on your monthly budget for{" "}
+                  {data.accountName}.
+                </Text>
+              </Section>
+
+              {/* Budget Status Section */}
+              <Section className="px-4 text-center">
+                <Text className="percentage text-6xl font-bold text-white mb-1">
+                  {(data?.percentageUsed ?? 0).toFixed(1)}%
+                </Text>
+                <Text className="text-emerald-400 text-base mb-4">
+                  of your budget used
+                </Text>
+
+                {/* Progress Bar - Email Compatible Version */}
+                <table
+                  cellPadding={0}
+                  cellSpacing={0}
+                  border={0}
+                  style={{ width: "100%" }}
+                >
+                  <tr>
+                    <td>
+                      <table
+                        cellPadding={0}
+                        cellSpacing={0}
+                        border={0}
+                        style={{
+                          width: "100%",
+                          backgroundColor: "#1f2937",
+                          borderRadius: "9999px",
+                          height: "8px",
+                        }}
+                      >
+                        <tr>
+                          <td
+                            style={{
+                              width: `${progressWidth}%`,
+                              backgroundColor: progressColor,
+                              height: "8px",
+                              borderRadius: "9999px",
+                            }}
+                          ></td>
+                          <td
+                            style={{
+                              width: `${100 - progressWidth}%`,
+                            }}
+                          ></td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <Text className="text-gray-400 text-sm mt-4">
+                  {remainingAmount >= 0
+                    ? `You have $${remainingAmount.toLocaleString()} remaining`
+                    : `You've exceeded your budget by $${Math.abs(
+                        remainingAmount
+                      ).toLocaleString()}`}
+                </Text>
+              </Section>
+
+              {/* Budget Details */}
+              <Section className="mt-6 px-4">
+                {/* Budget Card */}
+                <div className="w-full bg-[#002B1B] rounded-lg p-4 mb-3">
+                  <Text className="text-gray-400 text-sm mb-1">Budget</Text>
+                  <Text className="card-amount text-2xl font-bold text-emerald-400">
+                    ${(data?.budgetAmount ?? 0).toLocaleString()}
+                  </Text>
+                </div>
+
+                {/* Spent Card */}
+                <div className="w-full bg-[#2B0718] rounded-lg p-4">
+                  <Text className="text-gray-400 text-sm mb-1">Spent</Text>
+                  <Text className="card-amount text-2xl font-bold text-rose-400">
+                    ${(data?.totalExpenses ?? 0).toLocaleString()}
+                  </Text>
+                </div>
+              </Section>
+
+              {/* Recommendations Section */}
+              <Section className="mt-6 px-4 pb-8">
+                <Text className="text-base text-gray-300 leading-relaxed">
+                  {isWarning
+                    ? "Consider reviewing your spending in the highest expense categories to stay within your budget for the rest of the month."
+                    : "You're managing your budget well. Keep up the good work and continue monitoring your expenses."}
+                </Text>
+              </Section>
+
+              {/* Footer */}
+              <Section className="border-t border-gray-800 mt-4 px-4 py-6 text-center">
+                <Link
+                  href="http://localhost:3000/dashboard"
+                  className="inline-block px-6 py-3 rounded-lg bg-emerald-600 text-white text-sm font-semibold no-underline"
+                >
+                  View Details
+                </Link>
+                <Text className="text-xs text-gray-500 mt-6">
+                  © 2024 Spendix. All rights reserved.
+                </Text>
+              </Section>
+            </Container>
+          </Body>
+        </Tailwind>
+      </Html>
+    );
+  }
 
   if (type === "monthly-report") {
     return (
@@ -54,14 +195,10 @@ export const EmailTemplate = ({
         <Preview>Your Spendix Monthly Report</Preview>
         <Tailwind>
           <Body className="bg-black font-sans">
-            <Container className="mx-auto w-full max-w-[600px] p-0">
+            <Container className="w-full p-0">
               {/* Header Section */}
-              <Section className="p-8 text-center">
-                <Text className="mx-0 mb-2 mt-4 p-0 text-center text-2xl font-normal">
-                  <span className="font-bold tracking-tighter text-[#16A34A]">
-                    SPENDIX
-                  </span>
-                </Text>
+              <Section className="p-8 text-center bg-gray-900">
+              <h1 className="text-primary font-bold text-3xl">SPENDIX</h1>
                 <Text className="text-sm font-normal uppercase tracking-wider text-gray-400">
                   {data?.month} Financial Report
                 </Text>
@@ -113,6 +250,28 @@ export const EmailTemplate = ({
                     </Text>
                   </Column>
                 </Row>
+              </Section>
+
+              {/* Remaining Amount Section */}
+              <Section
+                className="my-6 rounded-2xl p-8 text-center"
+                style={{ backgroundColor: darkYellowBackground }}
+              >
+                <Heading
+                  className="m-0 text-3xl font-medium"
+                  style={{ color: yellowColor }}
+                >
+                  Remaining Amount
+                </Heading>
+                <Text className="my-4 text-7xl font-bold leading-none text-white">
+                  $
+                  {(
+                    (data?.budgetAmount ?? 0) - (data?.totalExpenses ?? 0)
+                  ).toLocaleString()}
+                </Text>
+                <Text className="mb-4 text-xl font-medium text-gray-300">
+                  This month's remaining budget
+                </Text>
               </Section>
 
               {/* Category Breakdown */}
@@ -202,7 +361,7 @@ export const EmailTemplate = ({
               </Section>
 
               {/* Footer */}
-              <Section className="pb-6 text-center">
+              <Section className="pb-6 text-center bg-gray-900">
                 <Text className="text-gray-300 text-lg leading-8">
                   Track your finances anytime, anywhere with Spendix
                 </Text>
@@ -229,179 +388,23 @@ export const EmailTemplate = ({
     );
   }
 
-  if (type === "budget-alert") {
-    const remainingAmount =
-      (data?.budgetAmount ?? 0) - (data?.totalExpenses ?? 0);
-    const isWarning = (data?.percentageUsed ?? 0) > 80;
-    const alertColor = isWarning ? "#EF4444" : primaryGreen;
-
-    return (
-      <Html>
-        <Head />
-        <Preview>Spendix Budget Alert</Preview>
-        <Tailwind>
-          <Body className="bg-black font-sans">
-            <Container className="mx-auto w-full max-w-[600px] p-0">
-              {/* Header Section */}
-              <Section className="p-8 text-center">
-                <Text className="mx-0 mb-2 mt-4 p-0 text-center text-2xl font-normal">
-                  <span className="font-bold tracking-tighter text-[#16A34A]">
-                    SPENDIX
-                  </span>
-                </Text>
-                <Text className="text-sm font-normal uppercase tracking-wider text-gray-400">
-                  Budget Alert
-                </Text>
-                <Heading
-                  className="my-4 text-4xl font-medium leading-tight"
-                  style={{ color: alertColor }}
-                >
-                  Budget Update
-                </Heading>
-                <Text className="mb-8 text-lg leading-8 text-gray-300">
-                  Hello {userName}, we have an update on your monthly budget.
-                </Text>
-              </Section>
-
-              {/* Budget Alert Section */}
-              <Section
-                className="my-6 rounded-2xl p-8 text-center"
-                style={{
-                  backgroundColor: `rgba(${
-                    isWarning ? "239, 68, 68" : "22, 163, 74"
-                  }, 0.1)`,
-                  backgroundImage: `radial-gradient(circle at bottom right, rgba(${
-                    isWarning ? "239, 68, 68" : "22, 163, 74"
-                  }, 0.4) 0%, transparent 60%)`,
-                }}
-              >
-                <Heading
-                  className="m-0 text-3xl font-medium"
-                  style={{ color: alertColor }}
-                >
-                  Budget Status
-                </Heading>
-                <Text className="my-4 text-7xl font-bold leading-none text-white">
-                  {(data?.percentageUsed ?? 0).toFixed(1)}%
-                </Text>
-                <Text className="mb-4 text-xl font-medium text-gray-300">
-                  of your budget used
-                </Text>
-
-                <div className="w-full bg-gray-800 h-4 rounded-full overflow-hidden mt-6">
-                  <div
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${Math.min(data?.percentageUsed ?? 0, 100)}%`,
-                      backgroundColor: alertColor,
-                    }}
-                  ></div>
-                </div>
-
-                <Text className="mt-4 text-sm text-gray-300">
-                  {remainingAmount >= 0
-                    ? `You have $${remainingAmount.toLocaleString()} remaining in your budget`
-                    : `You've exceeded your budget by $${Math.abs(
-                        remainingAmount
-                      ).toLocaleString()}`}
-                </Text>
-              </Section>
-
-              {/* Budget Details */}
-              <Section className="my-6 rounded-2xl bg-gray-900/50 p-8">
-                <Row>
-                  <Column className="w-1/3 text-center">
-                    <Text className="text-sm font-medium text-[#16A34A] m-0">
-                      Budget
-                    </Text>
-                    <Text className="my-1 text-2xl font-bold text-white m-0">
-                      ${(data?.budgetAmount ?? 0).toLocaleString()}
-                    </Text>
-                  </Column>
-                  <Column className="w-1/3 text-center">
-                    <Text className="text-sm font-medium text-[#16A34A] m-0">
-                      Spent
-                    </Text>
-                    <Text className="my-1 text-2xl font-bold text-white m-0">
-                      ${(data?.totalExpenses ?? 0).toLocaleString()}
-                    </Text>
-                  </Column>
-                  <Column className="w-1/3 text-center">
-                    <Text className="text-sm font-medium text-[#16A34A] m-0">
-                      Remaining
-                    </Text>
-                    <Text
-                      className="my-1 text-2xl font-bold m-0"
-                      style={{
-                        color: remainingAmount >= 0 ? "white" : "#EF4444",
-                      }}
-                    >
-                      ${remainingAmount.toLocaleString()}
-                    </Text>
-                  </Column>
-                </Row>
-              </Section>
-
-              {/* Recommendations */}
-              <Section className="my-6 rounded-2xl bg-gray-900/50 p-8">
-                <Heading className="m-0 text-xl font-medium text-[#16A34A] text-center">
-                  {isWarning ? "Budget Recommendations" : "You're on track!"}
-                </Heading>
-
-                <Text className="mt-4 text-base text-gray-300 leading-relaxed">
-                  {isWarning
-                    ? "Consider reviewing your spending in the highest expense categories to stay within your budget for the rest of the month."
-                    : "You're managing your budget well. Keep up the good work and continue monitoring your expenses."}
-                </Text>
-              </Section>
-
-              {/* Footer */}
-              <Section className="pb-6 text-center">
-                <Link
-                  href="#"
-                  className="mt-4 inline-flex items-center rounded-full bg-[#16A34A] px-12 py-4 text-center text-sm font-bold text-black no-underline"
-                >
-                  Check Spending Details
-                </Link>
-                <Link
-                  href="#"
-                  className="mt-4 block items-center text-center text-sm font-bold text-[#16A34A] no-underline"
-                >
-                  Adjust Budget Settings
-                </Link>
-                <Text className="mt-8 text-xs text-gray-500">
-                  © 2025 Spendix. All rights reserved.
-                </Text>
-              </Section>
-            </Container>
-          </Body>
-        </Tailwind>
-      </Html>
-    );
-  }
+  // Default fallback template
+  return (
+    <Html>
+      <Head />
+      <Preview>Spendix Notification</Preview>
+      <Tailwind>
+        <Body className="bg-black font-sans">
+          <Container className="w-full p-8">
+            <Text className="text-center text-white">
+              Hello {userName}, you have a new notification from Spendix.
+            </Text>
+          </Container>
+        </Body>
+      </Tailwind>
+    </Html>
+  );
 };
 
-// SpendixEmailTemplate.PreviewProps = {
-//   userName: "Alex",
-//   type: "monthly-report",
-//   data: {
-//     month: "March",
-//     stats: {
-//       totalIncome: 5250,
-//       totalExpenses: 3420,
-//       byCategory: {
-//         Housing: 1500,
-//         Food: 650,
-//         Transportation: 450,
-//         Entertainment: 320,
-//         Utilities: 280,
-//         Other: 220,
-//       },
-//     },
-//     insights: [
-//       "Your food expenses have decreased by 12% compared to last month.",
-//       "You've saved $320 more this month than your monthly average.",
-//       "Consider setting aside some of your extra savings for your emergency fund.",
-//     ],
-//   },
-// } as const;
+
+export default EmailTemplate
