@@ -92,8 +92,8 @@ export default function ReceiptScanner({
       >
         {scanReceiptLoading ? (
           <>
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Scanning...</span>
+            <Loader2 className="h-6 w-6 animate-spin text-black dark:text-white" />
+            <span className="text-black dark:text-white">Scanning...</span>
           </>
         ) : (
           <>

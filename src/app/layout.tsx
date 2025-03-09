@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.className} bg-background/20`}
+        className={`${inter.className}`}
         suppressHydrationWarning
       >
         <ThemeProvider
@@ -43,7 +43,6 @@ export default function RootLayout({
               <Header />
               <main className="flex-1">{children}</main>
               {/* add toaster */}
-              <Toaster richColors />
             </div>
           </ClerkProvider>
         </ThemeProvider>

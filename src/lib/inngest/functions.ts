@@ -74,6 +74,20 @@ export const checkBudgetAlert = inngest.createFunction(
 
                     if (percentageUsed >= 80 && (!budget.lastAlertSent || isNewMonth(new Date(budget.lastAlertSent), new Date()))) {
                         // send email
+                        // await sendEmail({
+                        //     to: budget.user.email,
+                        //     subject: `Budget Alert for ${defaultAccount.name}`,
+                        //     react: EmailTemplete({
+                        //         userName: budget.user.name,
+                        //         type: "budget-alert",
+                        //         data: {
+                        //             percentageUsed,
+                        //             budgetAmount: budgetAmount.toFixed(1),
+                        //             totalExpenses: totalExpenses.toFixed(1),
+                        //             accountName: defaultAccount.name
+                        //         }
+                        //     })
+                        // })
 
                         // update lastAlertSent
                         await prisma.budget.update({
@@ -177,18 +191,18 @@ export const processRecurringTransaction = inngest.createFunction(
                         isRecurring: false,
                     }
                 })
-            
+
                 //* update account balance
                 const balanceChange =
                     transaction.type === "EXPENSE" ?
                         -transaction.amount.toNumber()
                         : transaction.amount.toNumber()
-            
+
                 await tx.account.update({
                     where: { id: transaction.accountId },
                     data: { balance: { increment: balanceChange } }
                 })
-            
+
                 if (transaction.recurringInterval !== null) {
                     //* Update last processed data and next recurring date
                     await tx.transaction.update({
@@ -242,3 +256,71 @@ function calculateNextRecurringDate(startDate: Date, interval: RecurringInterval
 
     return date;
 }
+
+export const generateMonthlyReports = inngest.createFunction(
+    {
+        id: "generate-monthly-reports",
+        name: "Generate Monthly Reports"
+    },
+    { cron: "0 0 1 * *" },
+    async ({ step }) => {
+        const users = await prisma.user.findMany({
+            include: { accounts: true }
+        })
+
+        for (const user of users) {
+            await step.run(`generate-report-${user.id}`, async () => {
+                const lastMonth = new Date();
+                lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+                const stats = await getMonthlyStats(user.id, lastMonth);
+                const monthName = lastMonth.toLocaleString("default", {
+                    month: "long"
+                })
+
+                // const insights = await generateFinancialInsight(stats, monthName);
+            })
+        }
+    }
+)
+
+
+//* get monthly income and expense stats 
+const getMonthlyStats = async (userId: string, month: Date) => {
+    const startDate = new Date(month.getFullYear(), month.getMonth(), 1);
+    const endDate = new Date(month.getFullYear(), month.getMonth() + 1, 0)
+
+    const transactions = await prisma.transaction.findMany({
+        where: {
+            userId,
+            date: {
+                gte: startDate,
+                lte: endDate
+            }
+        }
+    })
+
+    return transactions.reduce(
+        (stats, t) => {
+            const amount = t.amount.toNumber();
+            if (t.type === "EXPENSE") {
+                stats.totalExpenses += amount;
+                stats.byCategory[t.category] = (stats.byCategory[t.category] || 0) + amount
+            } else {
+                stats.totalIncome += amount
+            }
+            return stats
+        }, {
+        totalExpenses: 0,
+        totalIncome: 0,
+        byCategory: {} as Record<string, number>,
+        transactionCount: transactions.length
+    }
+    )
+
+}
+
+//* get finaltial insights stats of the particular month
+// const generateFinancialInsight = async (stats, month) => {
+
+// } 

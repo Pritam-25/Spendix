@@ -43,8 +43,8 @@ const HeroSection = () => {
                 transition={{ delay: 0.2, duration: 0.8 }}
                 className="flex items-center justify-center gap-2 mb-6"
               >
-                <div className="bg-white/10 px-4 py-2 rounded-full border flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
+                <div className="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-green-500" />
                   <span className="text-sm font-medium">
                     AI-Powered Financial Management
                   </span>
