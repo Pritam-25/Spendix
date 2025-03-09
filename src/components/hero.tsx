@@ -38,41 +38,41 @@ const HeroSection = () => {
               className="text-center mb-20"
             >
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.8 }}
-                className="flex items-center justify-center gap-2 mb-6"
-              >
-                <div className="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-green-500" />
-                  <span className="text-sm font-medium">
-                    AI-Powered Financial Management
-                  </span>
-                </div>
-              </motion.div>
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.2, duration: 0.8 }}
+  className="flex items-center justify-center gap-2 mb-6"
+>
+  <div className="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border flex items-center gap-2">
+    <Sparkles className="w-5 h-5 text-green-500" />
+    <span className="text-xs sm:text-sm md:text-base font-medium">
+      AI-Powered Financial Management
+    </span>
+  </div>
+</motion.div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                className="font-extrabold text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight"
-              >
-                <span className="inline-block bg-clip-text text-transparent bg-gradient-to-t from-emerald-600 to-emerald-400 dark:from-emerald-800 dark:via-emerald-500 dark:to-emerald-300">
-                  Track Your Finances
-                </span>
-                <br />
-                <span className="inline-block">with AI-Powered Insights</span>
-              </motion.h1>
+<motion.h1
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.3, duration: 0.8 }}
+  className="font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight"
+>
+  <span className="inline-block bg-clip-text text-transparent bg-gradient-to-t from-emerald-600 to-emerald-400 dark:from-emerald-800 dark:via-emerald-600 dark:to-emerald-500">
+    Track Your Finances
+  </span>
+  <br />
+  <span className="inline-block text-3xl sm:text-4xl md:text-5xl lg:text-6xl">with AI-Powered Insights</span>
+</motion.h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="text-xl md:text-2xl text-gray-400 mb-8 max-w-3xl mx-auto"
-              >
-                Smart budget tracking, real-time analytics, and automated alerts
-                when you reach your limit.
-              </motion.p>
+<motion.p
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.4, duration: 0.8 }}
+  className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 max-w-3xl mx-auto"
+>
+  Smart budget tracking, real-time analytics, and automated alerts when you reach your limit.
+</motion.p>
+
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
