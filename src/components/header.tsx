@@ -7,7 +7,6 @@ import { ModeToggle } from "./mode_toggle";
 import Logo from "./logo"; // Import the Logo component
 import { checkUser } from "@/lib/checkUser";
 
-
 // left-1/2 transform -translate-x-1/2
 
 const Header = async () => {
@@ -27,7 +26,10 @@ const Header = async () => {
           </SignedOut>
           <SignedIn>
             <Link href={"/dashboard"}>
-              <Button variant={"outline"} className="flex items-center gap-2">
+              <Button
+                variant={"outline"}
+                className="hidden sm:flex items-center gap-2"
+              >
                 <LayoutDashboard size={18} />
                 <span className="hidden md:inline">Dashboard</span>
               </Button>

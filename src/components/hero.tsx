@@ -5,11 +5,12 @@ import { Bell, Sparkles, TrendingUp, Brain, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import AnalyticsSection from "./analytics-section";
 import Footer from "./footer";
+import Link from "next/link";
 
 const HeroSection = () => {
   return (
     <>
-      <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-transparent pt-[60px]">
+      <div className="relative w-full flex items-center justify-center overflow-hidden bg-transparent pt-[60px]">
         {/* Enhanced background effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#00FF88] opacity-[0.10] blur-[80px] rounded-full" />
@@ -38,41 +39,43 @@ const HeroSection = () => {
               className="text-center mb-20"
             >
               <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.2, duration: 0.8 }}
-  className="flex items-center justify-center gap-2 mb-6"
->
-  <div className="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border flex items-center gap-2">
-    <Sparkles className="w-5 h-5 text-green-500" />
-    <span className="text-xs sm:text-sm md:text-base font-medium">
-      AI-Powered Financial Management
-    </span>
-  </div>
-</motion.div>
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.8 }}
+                className="flex items-center justify-center gap-2 mb-6"
+              >
+                <div className="bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-green-500" />
+                  <span className="text-xs sm:text-sm md:text-base font-medium">
+                    AI-Powered Financial Management
+                  </span>
+                </div>
+              </motion.div>
 
-<motion.h1
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.3, duration: 0.8 }}
-  className="font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight"
->
-  <span className="inline-block bg-clip-text text-transparent bg-gradient-to-t from-emerald-600 to-emerald-400 dark:from-emerald-800 dark:via-emerald-600 dark:to-emerald-500">
-    Track Your Finances
-  </span>
-  <br />
-  <span className="inline-block text-3xl sm:text-4xl md:text-5xl lg:text-6xl">with AI-Powered Insights</span>
-</motion.h1>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight"
+              >
+                <span className="inline-block bg-clip-text text-transparent bg-gradient-to-t from-emerald-600 to-emerald-400 dark:from-emerald-800 dark:via-emerald-600 dark:to-emerald-500">
+                  Track Your Finances
+                </span>
+                <br />
+                <span className="inline-block font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+                  with AI-Powered Insights
+                </span>
+              </motion.h1>
 
-<motion.p
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 0.4, duration: 0.8 }}
-  className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 max-w-3xl mx-auto"
->
-  Smart budget tracking, real-time analytics, and automated alerts when you reach your limit.
-</motion.p>
-
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+                className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-8 max-w-3xl mx-auto"
+              >
+                Smart budget tracking, real-time analytics, and automated alerts
+                when you reach your limit.
+              </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -81,27 +84,28 @@ const HeroSection = () => {
                 className="flex gap-4 justify-center items-center mt-8"
               >
                 {/* Primary CTA Button */}
-                <Button className="relative group h-12 px-8 min-w-[160px] rounded-xl text-white transition-all bg-gradient-to-r from-emerald-700 to-emerald-500  hover:from-emerald-800 hover:to-emerald-600 dark:from-emerald-900 dark:to-emerald-700 dark:hover:from-emerald-800 dark:hover:to-emerald-600 shadow-md hover:shadow-lg">
-                  <span className="relative z-10 flex items-center gap-2 text-base font-semibold">
-                    Get Started
-                    <motion.div
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </motion.div>
-                  </span>
-                  <div className="absolute inset-0 rounded-xl  group-hover:opacity-100 transition-opacity duration-300" />
-                </Button>
+                <Link href="/dashboard">
+                  <Button className="relative group h-12 px-8 min-w-[160px] rounded-xl text-white transition-all bg-gradient-to-r from-emerald-700 to-emerald-500 hover:from-emerald-800 hover:to-emerald-600 dark:from-emerald-900 dark:to-emerald-700 dark:hover:from-emerald-800 dark:hover:to-emerald-600 shadow-md hover:shadow-lg">
+                    <span className="relative z-10 flex items-center gap-2 text-base font-semibold">
+                      Get Started
+                      <motion.div
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </motion.div>
+                    </span>
+                  </Button>
+                </Link>
 
                 {/* Secondary CTA Button */}
                 <Button
                   variant="outline"
-                  className="h-12 px-8 min-w-[160px] rounded-xl border-2 border-primary/20 hover:border-primary/40 bg-transparent hover:bg-primary/5 text-base font-semibold backdrop-blur-sm transition-all duration-300"
+                  className="hidden sm:flex h-12 px-8 min-w-[160px] rounded-xl border-2 border-primary/20 hover:border-primary/40 bg-transparent hover:bg-primary/5 text-base font-semibold backdrop-blur-sm transition-all duration-300"
                 >
                   Learn More
                 </Button>
