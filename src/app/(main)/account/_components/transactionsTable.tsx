@@ -92,16 +92,16 @@ export default function TransactionTable({
     data: deleted,
   } = useFetch(bulkDeleteTransactions);
 
-  //* Filtered and sorted transaction accourding condition
+  //* Filtered and sorted transaction according condition
   const filteredAndSortedTransaction = useMemo(() => {
     let result = [...transaction];
 
     // apply search filter
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
-      result = result.filter((transaction) => {
-        transaction.description?.toLowerCase().includes(search);
-      });
+      result = result.filter((transaction) => 
+        transaction.description?.toLowerCase().includes(search)
+      );
     }
 
     // Apply recurring filter
